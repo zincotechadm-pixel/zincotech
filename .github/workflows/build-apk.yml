@@ -66,7 +66,7 @@ jobs:
 
       - name: Gerar APK
         run: |
-          buildozer android clean
+          
           buildozer android debug
 
       - name: Enviar APK
