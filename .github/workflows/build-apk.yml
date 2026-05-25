@@ -17,18 +17,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-            - name: Instalar dependências
+      - name: Instalar dependências
         run: |
           sudo apt update
           sudo apt install -y zip unzip openjdk-17-jdk python3-pip build-essential git
           pip install --upgrade pip
           pip install buildozer cython==0.29.33
 
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-
-          yes | sdkmanager --licenses || true
-          
+      - name: Aceitar licenças Android
+        run: yes | sdkmanager --licenses
 
       - name: Gerar APK
         run: |
