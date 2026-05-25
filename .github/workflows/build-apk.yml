@@ -23,6 +23,7 @@ jobs:
           sudo apt install -y zip unzip openjdk-17-jdk python3-pip build-essential git
           pip install --upgrade pip
           pip install buildozer cython==0.29.33
+          yes | buildozer android update
 
       - name: Gerar APK
         run: |
