@@ -11,62 +11,37 @@ jobs:
       - name: Baixar código
         uses: actions/checkout@v4
 
-      - name: Configurar Java 17
+      - name: Configurar Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - name: Instalar dependências do sistema
+      - name: Instalar dependências
         run: |
           sudo apt update
-          sudo apt install -y \
-            python3-pip \
-            python3-setuptools \
-            python3-wheel \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            autoconf \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
-            cmake \
-            libffi-dev \
-            libssl-dev
-
-      - name: Instalar Buildozer
-        run: |
+          sudo apt install -y python3-pip build-essential git zip unzip openjdk-17-jdk
           python3 -m pip install --upgrade pip
           python3 -m pip install buildozer==1.5.0 cython==0.29.33
 
-      - name: Configurar Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Instalar ferramentas Android
+      - name: Aceitar licenças Android do Buildozer
         run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager "platform-tools"
-          sdkmanager "platforms;android-33"
-          sdkmanager "build-tools;33.0.2"
-          sdkmanager "ndk;25.2.9519653"
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo "d56f5187479451eabf01fb78af6dfcb131a6481e" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo "24333f8a63b6825ea9c5514f83c2829b004d1fee" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo "84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
 
-      - name: Ajustar Buildozer SPEC
+      - name: Ajustar buildozer.spec
         run: |
           sed -i 's/^android.api = .*/android.api = 33/' buildozer.spec || true
           sed -i 's/^android.minapi = .*/android.minapi = 21/' buildozer.spec || true
-          sed -i 's/^android.ndk = .*/android.ndk = 25.2.9519653/' buildozer.spec || true
           sed -i 's/^android.archs = .*/android.archs = arm64-v8a/' buildozer.spec || true
           sed -i 's/^requirements = .*/requirements = python3,kivy,pillow,reportlab/' buildozer.spec || true
+          grep -q '^android.build_tools_version' buildozer.spec && sed -i 's/^android.build_tools_version = .*/android.build_tools_version = 33.0.2/' buildozer.spec || echo 'android.build_tools_version = 33.0.2' >> buildozer.spec
 
       - name: Gerar APK
         run: |
-          
           buildozer android debug
 
       - name: Enviar APK
