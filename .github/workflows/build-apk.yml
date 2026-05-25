@@ -31,7 +31,8 @@ jobs:
         run: yes | sdkmanager --licenses
 
       - name: Gerar APK
-        run: buildozer android debug
+        run: |
+          yes | buildozer android debug
 
       - name: Enviar APK
         uses: actions/upload-artifact@v4
